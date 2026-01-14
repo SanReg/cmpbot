@@ -1,6 +1,26 @@
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ActivityType } = require('discord.js');
 const mongoose = require('mongoose');
+const express = require('express');
 require('dotenv').config();
+
+// Setup HTTP server for health checks
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'online',
+    bot: client.user ? client.user.tag : 'Not logged in',
+    uptime: process.uptime(),
+    serviceStatus: serviceStatus.isOnline ? 'online' : 'offline',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`🌐 Health check server running on http://localhost:${PORT}/health`);
+});
 
 const client = new Client({ 
   intents: [
